@@ -1,0 +1,255 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Nunito:wght@400;600;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --clk-bg:#0d0f14;--clk-face:#13161e;--clk-border:#1e2330;
+    --clk-green:#00e5a0;--clk-red:#ff4d6d;--clk-amber:#ffc14d;
+    --clk-text:#e8ecf4;--clk-muted:#5a6070;--clk-card:#191c27;
+  }
+  body{background:transparent;font-family:'Nunito',sans-serif;color:var(--clk-text)}
+  .wrap{max-width:420px;margin:0 auto;padding:1.5rem 1rem 2rem}
+  .clock-face{
+    background:var(--clk-face);border:1px solid var(--clk-border);
+    border-radius:24px;padding:2rem 1.5rem 1.5rem;text-align:center;
+    position:relative;margin-bottom:1rem;
+  }
+  .time-display{
+    font-family:'Share Tech Mono',monospace;font-size:clamp(52px,14vw,80px);
+    letter-spacing:4px;color:var(--clk-text);line-height:1;
+    text-shadow:0 0 30px rgba(0,229,160,0.15);
+    transition:color 0.3s;
+  }
+  .time-display.ringing{color:var(--clk-green);animation:pulse-glow 0.5s ease-in-out infinite alternate}
+  @keyframes pulse-glow{from{text-shadow:0 0 20px rgba(0,229,160,0.4)} to{text-shadow:0 0 60px rgba(0,229,160,0.9)}}
+  .date-line{font-size:12px;color:var(--clk-muted);letter-spacing:2px;text-transform:uppercase;margin-top:8px}
+  .alarm-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--clk-card);border:1px solid var(--clk-border);
+    border-radius:20px;padding:4px 12px;font-size:12px;color:var(--clk-muted);
+    margin-top:12px;cursor:default;transition:all 0.2s;
+  }
+  .alarm-badge.active{border-color:rgba(0,229,160,0.4);color:var(--clk-green)}
+  .alarm-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--clk-muted);transition:background 0.2s}
+  .alarm-badge.active .dot{background:var(--clk-green);box-shadow:0 0 6px var(--clk-green)}
+
+  .section-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--clk-muted);margin-bottom:8px}
+  .set-area{background:var(--clk-card);border:1px solid var(--clk-border);border-radius:16px;padding:1.2rem 1.25rem;margin-bottom:1rem}
+  .time-inputs{display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:1rem}
+  .time-inputs input[type=number]{
+    width:70px;background:#0d0f14;border:1px solid var(--clk-border);
+    border-radius:10px;color:var(--clk-text);font-family:'Share Tech Mono',monospace;
+    font-size:28px;text-align:center;padding:8px 4px;outline:none;
+    -moz-appearance:textfield;appearance:textfield;
+    transition:border-color 0.2s;
+  }
+  .time-inputs input[type=number]:focus{border-color:rgba(0,229,160,0.5)}
+  .time-inputs input[type=number]::-webkit-outer-spin-button,
+  .time-inputs input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+  .colon{font-family:'Share Tech Mono',monospace;font-size:28px;color:var(--clk-muted)}
+  .ampm-toggle{display:flex;gap:6px}
+  .ampm-btn{
+    padding:6px 14px;border-radius:8px;border:1px solid var(--clk-border);
+    background:transparent;color:var(--clk-muted);font-size:12px;font-weight:600;
+    cursor:pointer;transition:all 0.15s;letter-spacing:1px;
+  }
+  .ampm-btn.sel{background:rgba(0,229,160,0.12);border-color:rgba(0,229,160,0.4);color:var(--clk-green)}
+  .btn-row{display:flex;gap:8px}
+  .btn{
+    flex:1;padding:10px;border-radius:10px;border:none;font-size:14px;font-weight:700;
+    cursor:pointer;transition:all 0.15s;letter-spacing:0.5px;
+  }
+  .btn-set{background:var(--clk-green);color:#0d0f14}
+  .btn-set:hover{opacity:0.88}
+  .btn-clr{background:transparent;border:1px solid var(--clk-border);color:var(--clk-muted)}
+  .btn-clr:hover{border-color:var(--clk-red);color:var(--clk-red)}
+
+  .alarm-list{display:flex;flex-direction:column;gap:6px}
+  .alarm-item{
+    display:flex;align-items:center;gap:12px;
+    background:var(--clk-card);border:1px solid var(--clk-border);
+    border-radius:12px;padding:10px 14px;transition:border-color 0.2s;
+  }
+  .alarm-item.on{border-color:rgba(0,229,160,0.25)}
+  .alarm-time{font-family:'Share Tech Mono',monospace;font-size:22px;flex:1;color:var(--clk-text)}
+  .alarm-period{font-size:11px;color:var(--clk-muted);margin-top:2px}
+  .toggle{
+    width:38px;height:21px;border-radius:11px;border:none;position:relative;
+    background:var(--clk-border);cursor:pointer;transition:background 0.2s;flex-shrink:0;
+  }
+  .toggle.on{background:var(--clk-green)}
+  .toggle::after{
+    content:'';position:absolute;top:3px;left:3px;width:15px;height:15px;
+    border-radius:50%;background:#fff;transition:transform 0.2s;
+  }
+  .toggle.on::after{transform:translateX(17px)}
+  .del-btn{background:none;border:none;color:var(--clk-muted);cursor:pointer;font-size:16px;padding:2px 4px;transition:color 0.15s}
+  .del-btn:hover{color:var(--clk-red)}
+  .empty{font-size:13px;color:var(--clk-muted);text-align:center;padding:1rem 0}
+
+  .ringing-overlay{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;
+    align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;
+  }
+  .ringing-overlay.show{display:flex}
+  .ring-icon{font-size:56px;animation:shake 0.4s ease-in-out infinite}
+  @keyframes shake{0%,100%{transform:rotate(-10deg)} 50%{transform:rotate(10deg)}}
+  .ring-label{font-size:18px;color:var(--clk-green);font-weight:700;letter-spacing:2px}
+  .ring-time{font-family:'Share Tech Mono',monospace;font-size:48px;color:#fff}
+  .btn-dismiss{
+    background:var(--clk-red);color:#fff;border:none;border-radius:12px;
+    padding:12px 32px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:1px;
+  }
+  .btn-dismiss:hover{opacity:0.88}
+  .ring-sound{display:none}
+</style>
+
+<div class="wrap">
+  <div class="clock-face">
+    <div class="time-display" id="timeDisplay">00:00:00</div>
+    <div class="date-line" id="dateDisplay">Loading...</div>
+    <div class="alarm-badge" id="alarmBadge">
+      <div class="dot"></div>
+      <span id="badgeText">No alarm set</span>
+    </div>
+  </div>
+
+  <div class="set-area">
+    <div class="section-label">Set alarm</div>
+    <div class="time-inputs">
+      <input type="number" id="inpH" min="1" max="12" value="07" placeholder="07">
+      <span class="colon">:</span>
+      <input type="number" id="inpM" min="0" max="59" value="00" placeholder="00">
+      <div class="ampm-toggle" style="margin-left:8px">
+        <button class="ampm-btn sel" id="btnAM" onclick="setAmpm('AM')">AM</button>
+        <button class="ampm-btn" id="btnPM" onclick="setAmpm('PM')">PM</button>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-set" onclick="addAlarm()">Add alarm</button>
+      <button class="btn btn-clr" onclick="clearInputs()">Clear</button>
+    </div>
+  </div>
+
+  <div class="section-label" style="padding:0 4px">Alarms</div>
+  <div class="alarm-list" id="alarmList">
+    <div class="empty" id="emptyMsg">No alarms — add one above</div>
+  </div>
+</div>
+
+<div class="ringing-overlay" id="ringOverlay">
+  <div class="ring-icon">⏰</div>
+  <div class="ring-label">Alarm ringing!</div>
+  <div class="ring-time" id="ringTime">7:00 AM</div>
+  <button class="btn-dismiss" onclick="dismissAlarm()">Dismiss</button>
+</div>
+
+<script>
+let alarms=[];let ampm='AM';let ringingId=null;
+const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function pad(n){return String(n).padStart(2,'0')}
+function fmt12(h,m){let p=h>=12?'PM':'AM';let h12=h%12||12;return{str:h12+':'+pad(m),period:p}}
+
+function tick(){
+  const now=new Date();
+  let h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
+  let {str,period}=fmt12(h,m);
+  document.getElementById('timeDisplay').textContent=str+':'+pad(s)+' '+period;
+  document.getElementById('dateDisplay').textContent=days[now.getDay()]+', '+months[now.getMonth()]+' '+now.getDate()+' '+now.getFullYear();
+  checkAlarms(h,m,s);
+}
+
+function checkAlarms(h,m,s){
+  if(ringingId!==null)return;
+  alarms.forEach(a=>{
+    if(!a.on||a.rung)return;
+    let ah=a.hour24;
+    if(h===ah&&m===a.min&&s===0){
+      triggerAlarm(a);
+    }
+  });
+}
+
+function triggerAlarm(a){
+  ringingId=a.id;
+  document.getElementById('ringTime').textContent=a.display+' '+a.period;
+  document.getElementById('ringOverlay').classList.add('show');
+  document.getElementById('timeDisplay').classList.add('ringing');
+  a.rung=true;
+  renderAlarms();
+}
+
+function dismissAlarm(){
+  document.getElementById('ringOverlay').classList.remove('show');
+  document.getElementById('timeDisplay').classList.remove('ringing');
+  ringingId=null;
+}
+
+function setAmpm(v){
+  ampm=v;
+  document.getElementById('btnAM').classList.toggle('sel',v==='AM');
+  document.getElementById('btnPM').classList.toggle('sel',v==='PM');
+}
+
+function addAlarm(){
+  let hv=parseInt(document.getElementById('inpH').value)||7;
+  let mv=parseInt(document.getElementById('inpM').value)||0;
+  hv=Math.min(12,Math.max(1,hv));
+  mv=Math.min(59,Math.max(0,mv));
+  let h24=(ampm==='AM')?(hv===12?0:hv):(hv===12?12:hv+12);
+  let id=Date.now();
+  alarms.push({id,hour:hv,min:mv,period:ampm,hour24:h24,display:hv+':'+pad(mv),on:true,rung:false});
+  renderAlarms();
+  updateBadge();
+}
+
+function clearInputs(){
+  document.getElementById('inpH').value='07';
+  document.getElementById('inpM').value='00';
+  setAmpm('AM');
+}
+
+function toggleAlarm(id){
+  let a=alarms.find(x=>x.id===id);
+  if(a){a.on=!a.on;if(a.on)a.rung=false;}
+  renderAlarms();updateBadge();
+}
+
+function deleteAlarm(id){
+  alarms=alarms.filter(x=>x.id!==id);
+  renderAlarms();updateBadge();
+}
+
+function renderAlarms(){
+  const list=document.getElementById('alarmList');
+  const empty=document.getElementById('emptyMsg');
+  if(alarms.length===0){empty.style.display='block';list.innerHTML='';list.appendChild(empty);return;}
+  empty.style.display='none';
+  list.innerHTML='';
+  alarms.slice().reverse().forEach(a=>{
+    const el=document.createElement('div');
+    el.className='alarm-item'+(a.on?' on':'');
+    el.innerHTML=`<div style="flex:1"><div class="alarm-time">${a.display}</div><div class="alarm-period">${a.period}${a.rung?' · rang':''}</div></div>
+    <button class="toggle${a.on?' on':''}" onclick="toggleAlarm(${a.id})"></button>
+    <button class="del-btn" onclick="deleteAlarm(${a.id})" title="Delete">✕</button>`;
+    list.appendChild(el);
+  });
+}
+
+function updateBadge(){
+  const badge=document.getElementById('alarmBadge');
+  const active=alarms.filter(a=>a.on);
+  if(active.length===0){
+    badge.classList.remove('active');
+    document.getElementById('badgeText').textContent='No alarm set';
+  } else {
+    badge.classList.add('active');
+    let next=active[0];
+    document.getElementById('badgeText').textContent=active.length===1?'Alarm '+next.display+' '+next.period:active.length+' alarms on';
+  }
+}
+
+setInterval(tick,1000);tick();
+</script>
